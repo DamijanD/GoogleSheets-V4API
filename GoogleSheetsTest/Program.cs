@@ -108,13 +108,6 @@ namespace GoogleSheetsTest
                     var timeOnly = time - time.Date;
                     var values = splitedInputLine.Skip(2).Select(x => decimal.Parse(x)).Cast<object>().ToList();
 
-                    /*  var data = new List<object>();
-                      data.Add(new DateTime(date.Year, date.Month, date.Day, timeOnly.Hours, timeOnly.Minutes, 0));
-                      data.Add(timeOnly);
-                      data.AddRange(values);*/
-
-                    //  var data = new List<object>(splitedInputLine);
-
                     var data = new List<object>();
                     data.Add(splitedInputLine[0]);
                     data.Add(splitedInputLine[1]);
