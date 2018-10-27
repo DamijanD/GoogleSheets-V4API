@@ -91,12 +91,6 @@ namespace GoogleSheetsTest
 
                 Console.WriteLine("Range lines {0}", rangeLines);
 
-                if (rangeLines > 0)
-                {
-                    //we could seach by value, but we know that line numbers are the same...
-                    //var lastLine = rangeValues.Values[rangeLines - 1];
-                }
-
                 var newData = new List<IList<object>>();
 
                 for (int i = rangeLines; i < inputLines.Length; i++)
