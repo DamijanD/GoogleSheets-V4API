@@ -35,6 +35,11 @@ namespace GoogleSheetsTest
             string inputPath = System.Configuration.ConfigurationManager.AppSettings["InputPath"];
             string filePrefix = System.Configuration.ConfigurationManager.AppSettings["FilePrefix"];
 
+            int sheetIdFrom = int.Parse(System.Configuration.ConfigurationManager.AppSettings["From"]);
+            int sheetIdTo = int.Parse(System.Configuration.ConfigurationManager.AppSettings["To"]);
+
+            Console.WriteLine("From {0} to {1}", sheetIdFrom, sheetIdTo);
+
             var files = System.IO.Directory.EnumerateFiles(inputPath, filePrefix + "*.txt");
 
             Console.WriteLine("Found {0} in {1}", files.Count(), inputPath + filePrefix);
@@ -46,6 +51,11 @@ namespace GoogleSheetsTest
                 System.IO.FileInfo fi = new FileInfo(file);
 
                 string sheetName = fi.Name.Replace(filePrefix, "").Replace(".txt", "");
+
+                int sheetId = int.Parse(sheetName);
+                if (sheetId < sheetIdFrom || sheetId > sheetIdTo)
+                    continue;
+
                 string range = sheetName + "!A:AR";
 
                 var spreadsheet = service.Spreadsheets.Get(spreadsheetId).Execute();
