@@ -10,16 +10,24 @@ using System.Threading;
 using System.Linq;
 using System.Globalization;
 
-namespace GoogleSheetsTest
+namespace GoogleSheetsUploader
 {
-    class Program
+    public class LogProcessor
     {
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
         static string ApplicationName = "WeatherLogImporter";
 
-        static void Main(string[] args)
+        public delegate void MessageEventHandler(string msg);
+        public event MessageEventHandler OnMessage;
+
+        public void Message(string msg)
+        {
+            OnMessage?.Invoke(msg);
+        }
+
+        public void Process()
         {
             UserCredential credential = CreateGoogleCredential();
 
@@ -35,7 +43,9 @@ namespace GoogleSheetsTest
             ImportDayLog(service);
         }
 
-        private static void ImportMainLog(SheetsService service)
+
+
+        private void ImportMainLog(SheetsService service)
         {
             string spreadsheetId = System.Configuration.ConfigurationManager.AppSettings["spreadsheetId"];
 
@@ -45,15 +55,15 @@ namespace GoogleSheetsTest
             int sheetIdFrom = int.Parse(System.Configuration.ConfigurationManager.AppSettings["From"]);
             int sheetIdTo = int.Parse(System.Configuration.ConfigurationManager.AppSettings["To"]);
 
-            Console.WriteLine("From {0} to {1}", sheetIdFrom, sheetIdTo);
+            Message(string.Format("From {0} to {1}", sheetIdFrom, sheetIdTo));
 
             var files = System.IO.Directory.EnumerateFiles(inputPath, filePrefix + "*.txt");
 
-            Console.WriteLine("Found {0} in {1}", files.Count(), inputPath + filePrefix);
+            Message(string.Format("Found {0} in {1}", files.Count(), inputPath + filePrefix));
 
             foreach (var file in files)
             {
-                Console.WriteLine("Processing {0}", file);
+                Message(string.Format("Processing {0}", file));
 
                 System.IO.FileInfo fi = new FileInfo(file);
 
@@ -75,11 +85,11 @@ namespace GoogleSheetsTest
 
                 if (sheet == null)
                 {
-                    Console.WriteLine("Unable to get sheet {0}", sheetName);
+                    Message(string.Format("Unable to get sheet {0}", sheetName));
                     continue;
                 }
 
-                Console.WriteLine("Using sheet {0}", sheetName);
+                Message(string.Format("Using sheet {0}", sheetName));
 
                 string inputData;
 
@@ -92,13 +102,13 @@ namespace GoogleSheetsTest
 
                 if (string.IsNullOrEmpty(inputData))
                 {
-                    Console.WriteLine("File empty!");
+                    Message(string.Format("File empty!"));
                     continue;
                 }
 
                 var inputLines = inputData.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                Console.WriteLine("Loaded lines {0}", inputLines.Length);
+                Message(string.Format("Loaded lines {0}", inputLines.Length));
 
                 var rangeValues = service.Spreadsheets.Values.Get(spreadsheetId, range).Execute();
                 var rangeLines = 0;
@@ -106,7 +116,7 @@ namespace GoogleSheetsTest
                 if (rangeValues.Values != null)
                     rangeLines = rangeValues.Values.Count;
 
-                Console.WriteLine("Range lines {0}", rangeLines);
+                Message(string.Format("Range lines {0}", rangeLines));
 
                 var newData = new List<IList<object>>();
 
@@ -130,7 +140,7 @@ namespace GoogleSheetsTest
 
                 if (newData.Count > 0)
                 {
-                    Console.Write("Sending...");
+                    Message("Sending...");
 
                     ValueRange vr = new ValueRange();
                     vr.Values = newData;
@@ -140,22 +150,22 @@ namespace GoogleSheetsTest
                     request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
                     var response = request.Execute();
 
-                    Console.WriteLine("DONE");
+                    Message(string.Format("DONE"));
                 }
                 else
                 {
-                    Console.WriteLine("No new data.");
+                    Message(string.Format("No new data."));
                 }
             }
         }
 
-        private static void ImportDayLog(SheetsService service)
+        private void ImportDayLog(SheetsService service)
         {
             string spreadsheetId = System.Configuration.ConfigurationManager.AppSettings["DailySpreadsheetId"];
 
             string inputPath = System.Configuration.ConfigurationManager.AppSettings["DailyFile"];
 
-            Console.WriteLine("Processing day file {0}", inputPath);
+            Message(string.Format("Processing day file {0}", inputPath));
 
             string sheetName = "dayfile";
 
@@ -171,7 +181,7 @@ namespace GoogleSheetsTest
 
             if (sheet == null)
             {
-                Console.WriteLine("Unable to get sheet {0}", sheetName);
+                Message(string.Format("Unable to get sheet {0}", sheetName));
                 return;
             }
 
@@ -186,13 +196,13 @@ namespace GoogleSheetsTest
 
             if (string.IsNullOrEmpty(inputData))
             {
-                Console.WriteLine("File empty!");
+                Message(string.Format("File empty!"));
                 return;
             }
 
             var inputLines = inputData.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-            Console.WriteLine("Loaded lines {0}", inputLines.Length);
+            Message(string.Format("Loaded lines {0}", inputLines.Length));
 
             var rangeValues = service.Spreadsheets.Values.Get(spreadsheetId, range).Execute();
             var rangeLines = 0;
@@ -200,7 +210,7 @@ namespace GoogleSheetsTest
             if (rangeValues.Values != null)
                 rangeLines = rangeValues.Values.Count;
 
-            Console.WriteLine("Range lines {0}", rangeLines);
+            Message(string.Format("Range lines {0}", rangeLines));
 
             var newData = new List<IList<object>>();
 
@@ -271,7 +281,7 @@ namespace GoogleSheetsTest
 
             if (newData.Count > 0)
             {
-                Console.Write("Sending...");
+                Message("Sending...");
 
                 ValueRange vr = new ValueRange();
                 vr.Values = newData;
@@ -281,18 +291,18 @@ namespace GoogleSheetsTest
                 request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
                 var response = request.Execute();
 
-                Console.WriteLine("DONE");
+                Message(string.Format("DONE"));
             }
             else
             {
-                Console.WriteLine("No new data.");
+                Message(string.Format("No new data."));
             }
-            
+
         }
 
-        private static Sheet CreateSheet(SheetsService service, string spreadsheetId, string sheetName, ref Spreadsheet spreadsheet)
+        private Sheet CreateSheet(SheetsService service, string spreadsheetId, string sheetName, ref Spreadsheet spreadsheet)
         {
-            Console.WriteLine("Creating sheet {0}", sheetName);
+            Message(string.Format("Creating sheet {0}", sheetName));
             Request r = new Request();
             r.AddSheet = new AddSheetRequest()
             {
@@ -323,7 +333,7 @@ namespace GoogleSheetsTest
             return spreadsheet.Sheets.FirstOrDefault(x => x.Properties.Title == sheetName);
         }
 
-        private static UserCredential CreateGoogleCredential()
+        private UserCredential CreateGoogleCredential()
         {
             UserCredential credential;
 
@@ -336,7 +346,7 @@ namespace GoogleSheetsTest
                     "user",
                     CancellationToken.None,
                     new FileDataStore(credPath, true)).Result;
-                Console.WriteLine("Credential file saved to: " + credPath);
+                Message(string.Format("Credential file saved to: " + credPath));
             }
 
             return credential;
