@@ -41,12 +41,16 @@ namespace GoogleSheetsUploader
             ImportMainLog(service);
 
             ImportDayLog(service);
+
+            ImportMain2Log(service);
         }
 
 
 
         private void ImportMainLog(SheetsService service)
         {
+            Message("Main log");
+
             string spreadsheetId = System.Configuration.ConfigurationManager.AppSettings["spreadsheetId"];
 
             string inputPath = System.Configuration.ConfigurationManager.AppSettings["InputPath"];
@@ -161,6 +165,8 @@ namespace GoogleSheetsUploader
 
         private void ImportDayLog(SheetsService service)
         {
+            Message("Day log");
+
             string spreadsheetId = System.Configuration.ConfigurationManager.AppSettings["DailySpreadsheetId"];
 
             string inputPath = System.Configuration.ConfigurationManager.AppSettings["DailyFile"];
@@ -299,6 +305,125 @@ namespace GoogleSheetsUploader
             }
 
         }
+
+
+        private void ImportMain2Log(SheetsService service)
+        {
+            Message("Main2 log");
+
+            string spreadsheetId = System.Configuration.ConfigurationManager.AppSettings["MonthSpreadsheetId"];
+
+            string inputPath = System.Configuration.ConfigurationManager.AppSettings["InputPath"];
+            string fileEnding = System.Configuration.ConfigurationManager.AppSettings["MonthFileName"];
+
+            int sheetIdFrom = int.Parse(System.Configuration.ConfigurationManager.AppSettings["From"]);
+            int sheetIdTo = int.Parse(System.Configuration.ConfigurationManager.AppSettings["To"]);
+
+            Message(string.Format("From {0} to {1}", sheetIdFrom, sheetIdTo));
+
+            var files = System.IO.Directory.EnumerateFiles(inputPath, "*"+ fileEnding + ".txt");
+
+            Message(string.Format("Found {0} in {1}", files.Count(), inputPath + "*" + fileEnding + ".txt"));
+
+            foreach (var file in files)
+            {
+                Message(string.Format("Processing {0}", file));
+
+                System.IO.FileInfo fi = new FileInfo(file);
+
+                string sheetName = fi.Name.Replace(".txt", "");
+
+                /*int sheetId = int.Parse(sheetName);
+                if (sheetId < sheetIdFrom || sheetId > sheetIdTo)
+                    continue;*/
+
+                string range = sheetName + "!A:AA";
+
+                var spreadsheet = service.Spreadsheets.Get(spreadsheetId).Execute();
+                var sheet = spreadsheet.Sheets.FirstOrDefault(x => x.Properties.Title == sheetName);
+
+                if (sheet == null)
+                {
+                    sheet = CreateSheet(service, spreadsheetId, sheetName, ref spreadsheet);
+                }
+
+                if (sheet == null)
+                {
+                    Message(string.Format("Unable to get sheet {0}", sheetName));
+                    continue;
+                }
+
+                Message(string.Format("Using sheet {0}", sheetName));
+
+                string inputData;
+
+                using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = new StreamReader(stream))
+                {
+                    inputData = reader.ReadToEnd();
+                    reader.Close();
+                }
+
+                if (string.IsNullOrEmpty(inputData))
+                {
+                    Message(string.Format("File empty!"));
+                    continue;
+                }
+
+                var inputLines = inputData.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                Message(string.Format("Loaded lines {0}", inputLines.Length));
+
+                var rangeValues = service.Spreadsheets.Values.Get(spreadsheetId, range).Execute();
+                var rangeLines = 0;
+
+                if (rangeValues.Values != null)
+                    rangeLines = rangeValues.Values.Count;
+
+                Message(string.Format("Range lines {0}", rangeLines));
+
+                var newData = new List<IList<object>>();
+
+                for (int i = rangeLines; i < inputLines.Length; i++)
+                {
+                    var splitedInputLine = inputLines[i].Split(";".ToCharArray());
+
+                    var date = DateTime.ParseExact(splitedInputLine[0], "dd.MM.yy", CultureInfo.InvariantCulture);
+                    var time = DateTime.ParseExact(splitedInputLine[1], "HH:mm", CultureInfo.InvariantCulture);
+                    var timeOnly = time - time.Date;
+                    var values = splitedInputLine.Skip(2).Select(x => decimal.Parse(x)).Cast<object>().ToList();
+
+                    var data = new List<object>();
+                    data.Add(splitedInputLine[0]);
+                    data.Add(splitedInputLine[1]);
+                    data.AddRange(values);
+
+                    newData.Add(data);
+
+                }
+
+                if (newData.Count > 0)
+                {
+                    Message("Sending...");
+
+                    ValueRange vr = new ValueRange();
+                    vr.Values = newData;
+
+                    SpreadsheetsResource.ValuesResource.AppendRequest request = service.Spreadsheets.Values.Append(vr, spreadsheetId, range);
+                    request.InsertDataOption = SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum.INSERTROWS;
+                    request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
+                    var response = request.Execute();
+
+                    Message(string.Format("DONE"));
+                }
+                else
+                {
+                    Message(string.Format("No new data."));
+                }
+            }
+        }
+
+
 
         private Sheet CreateSheet(SheetsService service, string spreadsheetId, string sheetName, ref Spreadsheet spreadsheet)
         {
