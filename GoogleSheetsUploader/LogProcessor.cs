@@ -29,23 +29,29 @@ namespace GoogleSheetsUploader
 
         public void Process()
         {
-            UserCredential credential = CreateGoogleCredential();
-
-            // Create Google Sheets API service.
-            var service = new SheetsService(new BaseClientService.Initializer()
+            try
             {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
+                UserCredential credential = CreateGoogleCredential();
 
-            ImportMainLog(service);
+                // Create Google Sheets API service.
+                using (var service = new SheetsService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = credential,
+                    ApplicationName = ApplicationName,
+                }))
+                {
+                    ImportMainLog(service);
 
-            ImportDayLog(service);
+                    ImportDayLog(service);
 
-            ImportMain2Log(service);
+                    ImportMain2Log(service);
+                }
+            }
+            catch (Exception exc)
+            {
+                Message("LogProcessor.Process EXC: " + exc.Message);
+            }
         }
-
-
 
         private void ImportMainLog(SheetsService service)
         {

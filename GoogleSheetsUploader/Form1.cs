@@ -61,7 +61,10 @@ namespace GoogleSheetsUploader
         private void Process()
         {
             if (processing)
+            {
+                LogProcessor_OnMessage("Already processing! ");
                 return;
+            }
 
             try
             {
@@ -69,6 +72,8 @@ namespace GoogleSheetsUploader
 
                 label1.Text = "Start: " + DateTime.Now;
                 textBox1.Text = "";
+                LogProcessor_OnMessage(label1.Text);
+
                 LogProcessor logProcessor = new LogProcessor();
                 logProcessor.OnMessage += LogProcessor_OnMessage;
                 logProcessor.Process();
@@ -76,28 +81,40 @@ namespace GoogleSheetsUploader
                 runs++;
 
                 label1.Text += "... End: " + DateTime.Now + " (" + runs + ")";
+                LogProcessor_OnMessage("End: " + DateTime.Now + " (" + runs + ")");
                 notifyIcon1.Text = label1.Text;
+            }
+            catch (Exception exc)
+            {
+                LogProcessor_OnMessage("Process EXC: " + exc.Message);
             }
             finally
             {
                 processing = false;
+                LogProcessor_OnMessage("Finished");
             }
         }
 
         private void LogProcessor_OnMessage(string msg)
         {
             textBox1.Text += msg + System.Environment.NewLine;
+            System.IO.File.AppendAllText("WeatherToGoogleSheets.log", msg + System.Environment.NewLine);
+
             Application.DoEvents();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            LogProcessor_OnMessage("timer1_Tick");
+
             if (!processing)
                 backgroundWorker1.RunWorkerAsync();
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
+            LogProcessor_OnMessage("backgroundWorker1_DoWork");
+
             Process();
         }
     }
