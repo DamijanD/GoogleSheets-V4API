@@ -56,6 +56,10 @@ namespace GoogleSheetsUploader
         {
             if (!processing)
                 backgroundWorker1.RunWorkerAsync();
+            else
+            {
+                LogProcessor_OnMessage("Send_Click - already processing");
+            }
         }
 
         private void Process()
@@ -77,6 +81,7 @@ namespace GoogleSheetsUploader
                 LogProcessor logProcessor = new LogProcessor();
                 logProcessor.OnMessage += LogProcessor_OnMessage;
                 logProcessor.Process();
+                logProcessor.OnMessage -= LogProcessor_OnMessage;
 
                 runs++;
 
@@ -98,9 +103,7 @@ namespace GoogleSheetsUploader
         private void LogProcessor_OnMessage(string msg)
         {
             textBox1.Text += msg + System.Environment.NewLine;
-            System.IO.File.AppendAllText("WeatherToGoogleSheets.log", msg + System.Environment.NewLine);
-
-            Application.DoEvents();
+            System.IO.File.AppendAllText("WeatherToGoogleSheets.log", DateTime.Now.ToString("yyyyMMdd HH:mm:ss") + " " + msg + System.Environment.NewLine);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -109,6 +112,9 @@ namespace GoogleSheetsUploader
 
             if (!processing)
                 backgroundWorker1.RunWorkerAsync();
+            else
+                LogProcessor_OnMessage("timer1_Tick - already processing");
+
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)

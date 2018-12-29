@@ -121,6 +121,9 @@ namespace GoogleSheetsUploader
                 Message(string.Format("Loaded lines {0}", inputLines.Length));
 
                 var rangeValues = service.Spreadsheets.Values.Get(spreadsheetId, range).Execute();
+
+                Message(string.Format("Spreadsheets.Values.Get"));
+
                 var rangeLines = 0;
 
                 if (rangeValues.Values != null)
@@ -217,6 +220,9 @@ namespace GoogleSheetsUploader
             Message(string.Format("Loaded lines {0}", inputLines.Length));
 
             var rangeValues = service.Spreadsheets.Values.Get(spreadsheetId, range).Execute();
+
+            Message(string.Format("Spreadsheets.Values.Get"));
+
             var rangeLines = 0;
 
             if (rangeValues.Values != null)
@@ -381,6 +387,9 @@ namespace GoogleSheetsUploader
                 Message(string.Format("Loaded lines {0}", inputLines.Length));
 
                 var rangeValues = service.Spreadsheets.Values.Get(spreadsheetId, range).Execute();
+
+                Message(string.Format("Spreadsheets.Values.Get"));
+
                 var rangeLines = 0;
 
                 if (rangeValues.Values != null)
