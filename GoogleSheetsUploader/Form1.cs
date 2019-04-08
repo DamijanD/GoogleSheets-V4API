@@ -19,12 +19,18 @@ namespace GoogleSheetsUploader
 
         bool processing = false;
         int runs = 0;
+        int restartAfterNRuns = 12;
 
         private void Form1_Load(object sender, EventArgs e)
         {
             notifyIcon1.Visible = false;
 
             int timer = int.Parse(System.Configuration.ConfigurationManager.AppSettings["timer"]);
+            if (System.Configuration.ConfigurationManager.AppSettings["restartAfterNRuns"] != null)
+            {
+                restartAfterNRuns = int.Parse(System.Configuration.ConfigurationManager.AppSettings["restartAfterNRuns"]);
+            }
+
 
             if (timer > 0)
             {
@@ -111,7 +117,19 @@ namespace GoogleSheetsUploader
             LogProcessor_OnMessage("timer1_Tick");
 
             if (!processing)
+            {
+                if (restartAfterNRuns > 0 && runs > restartAfterNRuns)
+                {
+                    LogProcessor_OnMessage("Restarting...");
+
+                    Application.Restart();
+
+                    //System.Diagnostics.Process.Start(Application.ExecutablePath);
+                    //Application.Exit();
+                    return;
+                }
                 backgroundWorker1.RunWorkerAsync();
+            }
             else
                 LogProcessor_OnMessage("timer1_Tick - already processing");
 

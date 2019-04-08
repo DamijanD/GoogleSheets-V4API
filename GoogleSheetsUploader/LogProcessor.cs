@@ -40,6 +40,8 @@ namespace GoogleSheetsUploader
                     ApplicationName = ApplicationName,
                 }))
                 {
+                    service.HttpClient.Timeout = TimeSpan.FromMinutes(1);
+                    
                     ImportMainLog(service);
 
                     ImportDayLog(service);
@@ -343,6 +345,8 @@ namespace GoogleSheetsUploader
 
                 System.IO.FileInfo fi = new FileInfo(file);
 
+                Message("1");
+
                 string sheetName = fi.Name.Replace(".txt", "");
 
                 /*int sheetId = int.Parse(sheetName);
@@ -352,7 +356,9 @@ namespace GoogleSheetsUploader
                 string range = sheetName + "!A:AA";
 
                 var spreadsheet = service.Spreadsheets.Get(spreadsheetId).Execute();
+                Message("2");
                 var sheet = spreadsheet.Sheets.FirstOrDefault(x => x.Properties.Title == sheetName);
+                Message("3");
 
                 if (sheet == null)
                 {
@@ -372,9 +378,12 @@ namespace GoogleSheetsUploader
                 using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (var reader = new StreamReader(stream))
                 {
+                    Message("4");
                     inputData = reader.ReadToEnd();
                     reader.Close();
                 }
+
+                Message("5");
 
                 if (string.IsNullOrEmpty(inputData))
                 {
@@ -416,6 +425,8 @@ namespace GoogleSheetsUploader
                     newData.Add(data);
 
                 }
+
+                Message("6");
 
                 if (newData.Count > 0)
                 {
