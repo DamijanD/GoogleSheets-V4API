@@ -2,3 +2,6 @@ packages
 /.vs
 /GoogleSheetsTest/obj
 /GoogleSheetsTest/bin
+/GoogleSheetsUploader/bin/Debug
+/GoogleSheetsUploader/obj/Debug
+/GoogleSheetsTest/Data/New folder

@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GoogleSheetsUploader
@@ -114,6 +108,7 @@ namespace GoogleSheetsUploader
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            return; 
             LogProcessor_OnMessage("timer1_Tick");
 
             if (!processing)
@@ -140,6 +135,14 @@ namespace GoogleSheetsUploader
             LogProcessor_OnMessage("backgroundWorker1_DoWork");
 
             Process();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AirDavisProcessor a = new AirDavisProcessor();
+            a.Process();
+
+
         }
     }
 }
