@@ -121,6 +121,7 @@ namespace GoogleSheetsUploader
             if (rangeValues.Values == null)
             {
                 var header = new List<object>();
+                header.Add("Date");
                 header.Add("Time");
                 header.Add("Temp");
                 header.Add("Hum");
@@ -139,7 +140,8 @@ namespace GoogleSheetsUploader
             var received = DateTimeOffset.FromUnixTimeMilliseconds(airDataRecord.lastReceived.Value);
 
             var data = new List<object>();
-            data.Add(received);
+            data.Add(received.ToString("dd.MM.yy"));
+            data.Add(received.ToString("HH:mm"));
             data.Add(GetDecimalFromJson(airDataRecord.currConditionValues.First(x => x.sensorDataName == "Temp").value));
             data.Add(GetDecimalFromJson(airDataRecord.currConditionValues.First(x => x.sensorDataName == "Hum").value));
             data.Add(GetDecimalFromJson(airDataRecord.currConditionValues.First(x => x.sensorDataName == "PM 1").value));

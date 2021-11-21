@@ -108,7 +108,6 @@ namespace GoogleSheetsUploader
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            return; 
             LogProcessor_OnMessage("timer1_Tick");
 
             if (!processing)
@@ -141,8 +140,6 @@ namespace GoogleSheetsUploader
         {
             AirDavisProcessor a = new AirDavisProcessor();
             a.Process();
-
-
         }
     }
 }

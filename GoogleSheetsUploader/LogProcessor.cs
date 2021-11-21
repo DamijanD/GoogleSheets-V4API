@@ -28,8 +28,6 @@ namespace GoogleSheetsUploader
 
         public void Process()
         {
-            return;
-
             try
             {
                 UserCredential credential = GoogleSheetUtils.CreateGoogleCredential();
