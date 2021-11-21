@@ -14,6 +14,7 @@ namespace GoogleSheetsUploader
         bool processing = false;
         int runs = 0;
         int restartAfterNRuns = 12;
+        int mode = 0;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -24,7 +25,9 @@ namespace GoogleSheetsUploader
             {
                 restartAfterNRuns = int.Parse(System.Configuration.ConfigurationManager.AppSettings["restartAfterNRuns"]);
             }
+            mode = int.Parse(System.Configuration.ConfigurationManager.AppSettings["Mode"]);
 
+            this.Text += " " + mode.ToString();
 
             if (timer > 0)
             {
@@ -74,18 +77,31 @@ namespace GoogleSheetsUploader
             {
                 processing = true;
 
-                label1.Text = "Start: " + DateTime.Now;
+                LogProcessor_OnMessage("Start: " + DateTime.Now);
                 textBox1.Text = "";
                 LogProcessor_OnMessage(label1.Text);
 
-                LogProcessor logProcessor = new LogProcessor();
-                logProcessor.OnMessage += LogProcessor_OnMessage;
-                logProcessor.Process();
-                logProcessor.OnMessage -= LogProcessor_OnMessage;
+                if ((mode & 1) > 0)
+                {
+                    LogProcessor_OnMessage("Log proc...");
+                    LogProcessor logProcessor = new LogProcessor();
+                    logProcessor.OnMessage += LogProcessor_OnMessage;
+                    logProcessor.Process();
+                    logProcessor.OnMessage -= LogProcessor_OnMessage;
+                }
+
+                if ((mode & 2) > 0)
+                {
+                    LogProcessor_OnMessage("Air proc...");
+                    AirDavisProcessor airp = new AirDavisProcessor();
+                    airp.OnMessage += LogProcessor_OnMessage;
+                    airp.Process();
+                    airp.OnMessage -= LogProcessor_OnMessage;
+                }
 
                 runs++;
 
-                label1.Text += "... End: " + DateTime.Now + " (" + runs + ")";
+                //label1.Text += "... End: " + DateTime.Now + " (" + runs + ")";
                 LogProcessor_OnMessage("End: " + DateTime.Now + " (" + runs + ")");
                 notifyIcon1.Text = label1.Text;
             }
@@ -102,7 +118,11 @@ namespace GoogleSheetsUploader
 
         private void LogProcessor_OnMessage(string msg)
         {
-            textBox1.Text += msg + System.Environment.NewLine;
+            try
+            {
+                textBox1.Text += msg + System.Environment.NewLine;
+            }
+            catch { }
             System.IO.File.AppendAllText("WeatherToGoogleSheets.log", DateTime.Now.ToString("yyyyMMdd HH:mm:ss") + " " + msg + System.Environment.NewLine);
         }
 
@@ -134,12 +154,6 @@ namespace GoogleSheetsUploader
             LogProcessor_OnMessage("backgroundWorker1_DoWork");
 
             Process();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            AirDavisProcessor a = new AirDavisProcessor();
-            a.Process();
         }
     }
 }
