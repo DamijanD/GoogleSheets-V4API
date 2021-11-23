@@ -94,7 +94,7 @@ namespace GoogleSheetsUploader
                 return;
             }
 
-            string sheetName = $"Air{DateTime.Now.Year}";
+            string sheetName = $"Air{DateTime.Now.Year}-{DateTime.Now.Month:00}";
 
             string range = sheetName + "!A:AR";
 
@@ -137,10 +137,10 @@ namespace GoogleSheetsUploader
             }
 
             var airDataRecord = airData[0];
-            var received = DateTimeOffset.FromUnixTimeMilliseconds(airDataRecord.lastReceived.Value);
+            var received = DateTimeOffset.FromUnixTimeMilliseconds(airDataRecord.lastReceived.Value).ToLocalTime();
 
             var data = new List<object>();
-            data.Add(received.ToString("dd.MM.yy"));
+            data.Add(received.ToString("dd.MM.yyyy"));
             data.Add(received.ToString("HH:mm"));
             data.Add(GetDecimalFromJson(airDataRecord.currConditionValues.First(x => x.sensorDataName == "Temp").value));
             data.Add(GetDecimalFromJson(airDataRecord.currConditionValues.First(x => x.sensorDataName == "Hum").value));
