@@ -99,6 +99,15 @@ namespace GoogleSheetsUploader
                     airp.OnMessage -= LogProcessor_OnMessage;
                 }
 
+                if ((mode & 4) > 0)
+                {
+                    LogProcessor_OnMessage("Water proc...");
+                    ArsoWaterFlowProcessor waterp = new ArsoWaterFlowProcessor();
+                    waterp.OnMessage += LogProcessor_OnMessage;
+                    waterp.Process();
+                    waterp.OnMessage -= LogProcessor_OnMessage;
+                }
+
                 runs++;
 
                 //label1.Text += "... End: " + DateTime.Now + " (" + runs + ")";
