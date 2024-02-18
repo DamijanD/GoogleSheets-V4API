@@ -201,10 +201,13 @@ namespace GoogleSheetsUploader
                 data.Add(waterDataDataRecord.reka);
                 data.Add(waterDataDataRecord.merilno_mesto);
                 data.Add(waterDataDataRecord.ime_kratko);
-                data.Add(decimal.Parse(waterDataDataRecord.vodostaj, CultureInfo.InvariantCulture));
-                data.Add(decimal.Parse(waterDataDataRecord.pretok, CultureInfo.InvariantCulture));
+                //data.Add(decimal.Parse(waterDataDataRecord.vodostaj, CultureInfo.InvariantCulture));
+                SafeDecimalParse(waterDataDataRecord.vodostaj, data);
+                //data.Add(decimal.Parse(waterDataDataRecord.pretok, CultureInfo.InvariantCulture));
+                SafeDecimalParse(waterDataDataRecord.pretok, data);
                 data.Add(waterDataDataRecord.pretok_znacilni);
-                data.Add(decimal.Parse(waterDataDataRecord.temp_vode, CultureInfo.InvariantCulture));
+                //data.Add(decimal.Parse(waterDataDataRecord.temp_vode, CultureInfo.InvariantCulture));
+                SafeDecimalParse(waterDataDataRecord.temp_vode, data);
 
                 newData.Add(data);
             }
@@ -227,6 +230,14 @@ namespace GoogleSheetsUploader
             {
                 Message(string.Format("No new data."));
             }
+        }
+
+        private static void SafeDecimalParse(string datastr, List<object> data)
+        {
+            if (decimal.TryParse(datastr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal decval))
+                data.Add(decval);
+            else
+                data.Add(null);
         }
     }
 
