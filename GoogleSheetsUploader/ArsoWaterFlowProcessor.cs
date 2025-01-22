@@ -239,6 +239,16 @@ namespace GoogleSheetsUploader
             if (received > lastReceived)
             {
                 var waterDataDataRecord = waterData.postaja.FirstOrDefault(x => x.ime_kratko.ToLower() == "poljanska sora - žiri");
+                if (waterDataDataRecord == null)
+                {
+                    waterDataDataRecord = waterData.postaja.FirstOrDefault(x => x.ime_kratko.ToLower() == "poljanska sora - žiri iii");
+                }
+
+                if (waterDataDataRecord == null)
+                {
+                    Message("Water no data for Poljanska Sora - Žiri");
+                    return;
+                }
 
                 var data = new List<object>();
                 data.Add(received.ToString("dd.MM.yyyy"));
