@@ -84,6 +84,52 @@ namespace GoogleSheetsUploader
 
         private arsopodatki GetWaterData()
         {
+           /* string ww = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<arsopodatki verzija=""1.5"">
+<vir>Agencija RS za okolje</vir>
+<predlagan_zajem>5 minut čez polno uro ali pol ure</predlagan_zajem>
+<predlagan_zajem_perioda>30 min</predlagan_zajem_perioda>
+<datum_priprave>2025-01-22 16:00</datum_priprave>
+<postaja sifra=""3370"" wgs84_dolzina=""14.0999"" wgs84_sirina=""46.35697"" kota_0=""468.09"">
+<reka>Natega</reka>
+<merilno_mesto>Mlino</merilno_mesto>
+<ime_kratko>Natega - Mlino</ime_kratko>
+<datum>2025-01-22 16:00</datum>
+<datum_cet>2025-01-22 16:00</datum_cet>
+<vodostaj>16</vodostaj>
+<prvi_vv_vodostaj/>
+<drugi_vv_vodostaj/>
+<tretji_vv_vodostaj/>
+<vodostaj_znacilni/>
+</postaja>
+<postaja sifra=""3320"" wgs84_dolzina=""13.95005"" wgs84_sirina=""46.27359"" kota_0=""504.45"">
+<reka>Bistrica</reka>
+<merilno_mesto>Bohinjska Bistrica</merilno_mesto>
+<ime_kratko>Bistrica - Bohinjska Bistrica</ime_kratko>
+<datum>2025-01-22 16:00</datum>
+<datum_cet>2025-01-22 16:00</datum_cet>
+<vodostaj>46</vodostaj>
+<pretok>1</pretok>
+<prvi_vv_pretok>80.0</prvi_vv_pretok>
+<drugi_vv_pretok>117.0</drugi_vv_pretok>
+<tretji_vv_pretok>132.0</tretji_vv_pretok>
+<pretok_znacilni>nizki pretok</pretok_znacilni>
+<temp_vode>5.4</temp_vode>
+</postaja>
+<postaja sifra=""9420"" wgs84_dolzina=""13.53522"" wgs84_sirina=""45.60157"">
+<reka>Jadransko morje</reka>
+<merilno_mesto>Tržaški zaliv (Zarja)</merilno_mesto>
+<ime_kratko>Jadransko morje - Tržaški zaliv</ime_kratko>
+<datum>2025-01-22 16:00</datum>
+<datum_cet>2025-01-22 16:00</datum_cet>
+<temp_vode>9.1</temp_vode>
+</postaja>
+</arsopodatki>";
+
+
+            return FromXml<arsopodatki>(ww);*/
+
+
             string waterUrl = System.Configuration.ConfigurationManager.AppSettings["WaterDataUrl"];
 
             HttpClient client = new HttpClient();
@@ -374,15 +420,15 @@ namespace GoogleSheetsUploader
 
         private string smer_valovanjaField;
 
-        private ushort prvi_vv_vodostajField;
+        private string prvi_vv_vodostajField;
 
         private bool prvi_vv_vodostajFieldSpecified;
 
-        private ushort drugi_vv_vodostajField;
+        private string drugi_vv_vodostajField;
 
         private bool drugi_vv_vodostajFieldSpecified;
 
-        private ushort tretji_vv_vodostajField;
+        private string tretji_vv_vodostajField;
 
         private bool tretji_vv_vodostajFieldSpecified;
 
@@ -552,7 +598,7 @@ namespace GoogleSheetsUploader
         }
 
         /// <remarks/>
-        public ushort prvi_vv_vodostaj
+        public string prvi_vv_vodostaj
         {
             get
             {
@@ -579,7 +625,7 @@ namespace GoogleSheetsUploader
         }
 
         /// <remarks/>
-        public ushort drugi_vv_vodostaj
+        public string drugi_vv_vodostaj
         {
             get
             {
@@ -606,7 +652,7 @@ namespace GoogleSheetsUploader
         }
 
         /// <remarks/>
-        public ushort tretji_vv_vodostaj
+        public string tretji_vv_vodostaj
         {
             get
             {
