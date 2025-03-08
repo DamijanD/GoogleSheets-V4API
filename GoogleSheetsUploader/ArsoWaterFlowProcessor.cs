@@ -442,15 +442,15 @@ namespace GoogleSheetsUploader
 
         private bool tretji_vv_vodostajFieldSpecified;
 
-        private decimal prvi_vv_pretokField;
+        private string prvi_vv_pretokField;
 
         private bool prvi_vv_pretokFieldSpecified;
 
-        private decimal drugi_vv_pretokField;
+        private string drugi_vv_pretokField;
 
         private bool drugi_vv_pretokFieldSpecified;
 
-        private decimal tretji_vv_pretokField;
+        private string tretji_vv_pretokField;
 
         private bool tretji_vv_pretokFieldSpecified;
 
@@ -689,7 +689,7 @@ namespace GoogleSheetsUploader
         }
 
         /// <remarks/>
-        public decimal prvi_vv_pretok
+        public string prvi_vv_pretok
         {
             get
             {
@@ -716,7 +716,7 @@ namespace GoogleSheetsUploader
         }
 
         /// <remarks/>
-        public decimal drugi_vv_pretok
+        public string drugi_vv_pretok
         {
             get
             {
@@ -743,7 +743,7 @@ namespace GoogleSheetsUploader
         }
 
         /// <remarks/>
-        public decimal tretji_vv_pretok
+        public string tretji_vv_pretok
         {
             get
             {

@@ -6,3 +6,6 @@ packages
 /GoogleSheetsUploader/obj/Debug
 /GoogleSheetsTest/Data/New folder
 /_test
+/GoogleSheetsUploader/bin
+/GoogleSheetsUploader/obj/Release
+/GoogleSheetsTest/Data
